@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "Please cite the OpenPlant paper and the original datasets used in your work."
+title: "OpenPlant: A Large-Scale Benchmark Dataset for Agricultural Plant Classification Using CNNs, ViTs, and VLMs"
+type: software
+version: 1.0.0
+repository-code: "https://github.com/Kaiqi6/OpenPlant"
+authors:
+  - family-names: Liu
+    given-names: Kaiqi
+  - family-names: Sun
+    given-names: Wei
+  - family-names: Wang
+    given-names: Guanping
+  - family-names: Feng
+    given-names: Quan
+  - family-names: Li
+    given-names: Hui
+preferred-citation:
+  type: article
+  title: "OpenPlant: A Large-Scale Benchmark Dataset for Agricultural Plant Classification Using CNNs, ViTs, and VLMs"
+  authors:
+    - family-names: Liu
+      given-names: Kaiqi
+    - family-names: Sun
+      given-names: Wei
+    - family-names: Wang
+      given-names: Guanping
+    - family-names: Feng
+      given-names: Quan
+    - family-names: Li
+      given-names: Hui
+  journal: Plants
+  year: 2026
+  volume: "15"
+  issue: "5"
+  start: "727"
+  doi: "10.3390/plants15050727"

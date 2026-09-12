@@ -1,0 +1,43 @@
+{
+  "model_name": "efficientvit_l3.r224_in1k",
+  "num_classes": 1167,
+  "image_size": 224,
+  "resize_shorter": 256,
+  "batch_size": 64,
+  "epochs": 100,
+  "learning_rate": 0.01,
+  "weight_decay": 0.1,
+  "scheduler_gamma": 0.9,
+  "gradient_clip_norm": 1.0,
+  "seed": 42,
+  "workers": 16,
+  "amp": true,
+  "data_parallel": false,
+  "pretrained": true,
+  "patience": 0,
+  "mean": [
+    0.43056735,
+    0.46167394,
+    0.36951741
+  ],
+  "std": [
+    0.22340974,
+    0.21595199,
+    0.22381605
+  ],
+  "provenance": {
+    "historical_run": "efficientvit_l3.r224_in1k_20250227_123410",
+    "legacy_weight": "model/efficientvit_l3.pth",
+    "configuration_evidence": "empty saved config; see fallback_fields",
+    "image_size_evidence": "timm registered pretrained input_size; legacy code read model.default_cfg",
+    "epoch_evidence": "100 entries in historical learning_rates",
+    "learning_rate_evidence": "first recorded rate 0.009 is after gamma=0.9; inferred initial learning rate 0.01",
+    "fallback_fields": {
+      "batch_size": "64 from archived test11.py defaults",
+      "seed": "42 from archived test11.py defaults",
+      "workers": "16 from archived test11.py defaults",
+      "amp": "true from archived test11.py defaults",
+      "data_parallel": "false from archived test11.py defaults"
+    }
+  }
+}

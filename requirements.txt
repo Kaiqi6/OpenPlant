@@ -1,0 +1,2 @@
+# Fixed-manifest selection, image reconstruction, and validation.
+Pillow>=10,<13

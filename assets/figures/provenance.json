@@ -1,0 +1,108 @@
+{
+  "paper_doi": "10.3390/plants15050727",
+  "source": "Author-supplied paper proof figure assets; copied without alteration",
+  "files": [
+    {
+      "file": "long_tail_distribution.png",
+      "source_asset": "long_tail_distribution.png",
+      "sha256": "e6e45b015226379dfb516ea7bc53d0a8e81a4e731f3e914b350a7fa9381ebf03",
+      "bytes": 812937
+    },
+    {
+      "file": "diversity.png",
+      "source_asset": "diversity.png",
+      "sha256": "5638b41d77c81eb547b13d2fce134f4109c1ddb76e8ca2c8da73cb29b1038e28",
+      "bytes": 2206876
+    },
+    {
+      "file": "diversity_richness.png",
+      "source_asset": "diversity_richness.png",
+      "sha256": "d5d0690375ed3a54f2939d53636cb0233c695a3f1b4451c2ec6e8d3a4aac5627",
+      "bytes": 266988
+    },
+    {
+      "file": "hierarchy.png",
+      "source_asset": "Hierarchy.png",
+      "sha256": "b9b20a5619f77ad524e2f4a633955037e7ee7f45cbdf17146d37f98c4e2d6f00",
+      "bytes": 2814078
+    },
+    {
+      "file": "timeline.png",
+      "source_asset": "timeline.png",
+      "sha256": "224bcb5f02cf7741685765e4daec9298d7d4d5ebd5b2abbdba50880cdc135175",
+      "bytes": 440222
+    },
+    {
+      "file": "class_distribution_accuracy.png",
+      "source_asset": "class_distribution_accuracy.png",
+      "sha256": "faccca9432e7b92918f7a4bff9fffef56aabffe674e117faae23b4a8eb931fdc",
+      "bytes": 356620
+    },
+    {
+      "file": "radar.png",
+      "source_asset": "radar.png",
+      "sha256": "4623dacac6ec55c587b80cbcfda41803ebb5be95a8380db11746ab531566eddb",
+      "bytes": 282643
+    },
+    {
+      "file": "auc_bar_comparison.png",
+      "source_asset": "auc_bar_comparison.png",
+      "sha256": "912caa8b2f11ecbc1b23476b5f86c36b9736c0abcf31cf293cfd3db79921d707",
+      "bytes": 289553
+    },
+    {
+      "file": "confusion_matrix.png",
+      "source_asset": "confusion_matrix.png",
+      "sha256": "9ac6d4f424cb570e5479407667ce5641f674ab093a2c10a755a93f6005176af3",
+      "bytes": 190824
+    },
+    {
+      "file": "confused_pairs.png",
+      "source_asset": "confused_pairs.png",
+      "sha256": "7628a0d1b57888bd9633fe1d3dc31380a54893958c5bcc65bd2982794d46761b",
+      "bytes": 9252565
+    },
+    {
+      "file": "radar_vlm.png",
+      "source_asset": "radar_VLM.png",
+      "sha256": "7da29403ec238f84e4b900e6fa86461d915a0c2d8efd88ae7303eabfc2b07c34",
+      "bytes": 521775
+    },
+    {
+      "file": "confusion_matrix_vlms.png",
+      "source_asset": "confusion_matrix_vlms.png",
+      "sha256": "9767d293b4b8f3e1174f2a1a79052161eeee10c542f47a1242389c820eac8e64",
+      "bytes": 108709
+    },
+    {
+      "file": "vlm1.png",
+      "source_asset": "vlm1.PNG",
+      "sha256": "f5a8cb090a3228e1c58310d700a9df9b629f5aa7eff1e24813c0a80a1c659c95",
+      "bytes": 815648
+    },
+    {
+      "file": "vlm2.png",
+      "source_asset": "vlm2.PNG",
+      "sha256": "60d5af812b8fa112bfcc1b47348cff561b41b5e6ddb5815151187e549f3ec728",
+      "bytes": 821197
+    },
+    {
+      "file": "vlm3.png",
+      "source_asset": "vlm3.PNG",
+      "sha256": "1cf5d7b98c0ecaadc613e6c6200293462d9065b73fdc1949e0a42bc3b465b7ab",
+      "bytes": 802662
+    },
+    {
+      "file": "vlm4.png",
+      "source_asset": "vlm4.PNG",
+      "sha256": "524c147f26520cf88380bc64ce16e38f9e5654059dc70f65cbb4ee1c0f43c66d",
+      "bytes": 790053
+    },
+    {
+      "file": "model_correlation_matrix.png",
+      "source_asset": "model_correlation_matrix.png",
+      "sha256": "e262bc9167b83334d5022308c401cdd9fdaf578980c9e0229423ac85e3daf72f",
+      "bytes": 368100
+    }
+  ]
+}

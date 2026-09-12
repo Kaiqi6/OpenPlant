@@ -1,0 +1,37 @@
+{
+  "model_name": "resnet101.a1h_in1k",
+  "num_classes": 1167,
+  "image_size": 224,
+  "resize_shorter": 256,
+  "batch_size": 64,
+  "epochs": 100,
+  "learning_rate": 0.001,
+  "weight_decay": 0.1,
+  "scheduler_gamma": 0.9,
+  "gradient_clip_norm": 1.0,
+  "seed": 42,
+  "workers": 8,
+  "amp": true,
+  "data_parallel": true,
+  "pretrained": true,
+  "patience": 0,
+  "mean": [
+    0.43056735,
+    0.46167394,
+    0.36951741
+  ],
+  "std": [
+    0.22340974,
+    0.21595199,
+    0.22381605
+  ],
+  "provenance": {
+    "historical_run": "resnet101_test",
+    "legacy_weight": "model/resnet101.pth",
+    "configuration_evidence": "archived v2 config.json; optimizer and augmentation in test12.py",
+    "image_size_evidence": "timm registered pretrained input_size; legacy code read model.default_cfg",
+    "epoch_evidence": "100 entries in historical learning_rates",
+    "learning_rate_evidence": "saved config.json, corroborated by history learning rates",
+    "fallback_fields": {}
+  }
+}
