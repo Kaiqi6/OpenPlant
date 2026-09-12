@@ -1,22 +1,50 @@
-# OpenPlant
+<p align="center">
+  <a href="assets/logo/openplant-mosaic.tiff">
+    <img src="assets/logo/openplant-mosaic.png" width="100%" alt="OpenPlant lettering formed from a mosaic of plant photographs">
+  </a>
+</p>
 
-**A large-scale benchmark for agricultural plant classification**
+<h1 align="center">OpenPlant</h1>
 
-[Paper](https://doi.org/10.3390/plants15050727) · [Image manifest](metadata/manifest.csv.gz) · [41 source datasets](docs/sources.md) · [Reconstruction](docs/reconstruction.md) · [Training](docs/training.md) · [Paper figures](docs/figures.md) · [OpenPlant mosaic (original TIFF)](assets/logo/openplant-mosaic.tiff)
+<p align="center">
+  <strong>A large-scale benchmark for agricultural plant classification</strong><br>
+  <em>Plants · 2026 · 15(5), 727</em>
+</p>
 
-Official repository for **OpenPlant: A Large-Scale Benchmark Dataset for Agricultural Plant Classification Using CNNs, ViTs, and VLMs**, published in *Plants* 2026, 15(5), 727.
+<p align="center">
+  <a href="https://doi.org/10.3390/plants15050727">Paper</a> ·
+  <a href="metadata/manifest.csv.gz">Image manifest</a> ·
+  <a href="docs/sources.md">Source datasets</a> ·
+  <a href="#get-started">Get started</a> ·
+  <a href="docs/training.md">Training</a> ·
+  <a href="docs/figures.md">Figure gallery</a>
+</p>
 
-Kaiqi Liu, Wei Sun, Guanping Wang, Quan Feng, and Hui Li · Gansu Agricultural University
+<p align="center">
+  Kaiqi Liu, Wei Sun, Guanping Wang, Quan Feng, and Hui Li<br>
+  Gansu Agricultural University
+</p>
 
-OpenPlant brings agricultural crops, weeds, and wild plants into a shared classification benchmark spanning diverse growth stages, plant structures, and environments. It contains **635,176 RGB images and 1,167 class labels**, with a long-tailed distribution. The paper evaluates **10 CNNs, 6 ViTs, and 12 vision-language models**.
+| RGB images | Plant classes | Models evaluated in the paper |
+|:---:|:---:|:---:|
+| **635,176** | **1,167** | **28** — 10 CNNs · 6 ViTs · 12 VLMs |
 
-![OpenPlant class distribution and representative head, medium, and tail samples](assets/figures/long_tail_distribution.png)
+OpenPlant brings agricultural crops, weeds, and wild plants into a shared classification benchmark spanning diverse growth stages, plant structures, and environments. Its long-tailed class distribution supports the study of plant recognition across common and rare categories, with comparisons across convolutional networks, vision transformers, and vision-language models.
 
-*Figure 1 from the paper: class distribution and representative samples.*
+This is the official repository for [**OpenPlant: A Large-Scale Benchmark Dataset for Agricultural Plant Classification Using CNNs, ViTs, and VLMs**](https://doi.org/10.3390/plants15050727). [Download the mosaic artwork](assets/logo/openplant-mosaic.tiff) as an original TIFF.
 
-## What is available
+## Explore the dataset
 
-This GitHub release provides the full image membership and fixed splits, source links and references, manifest-driven selection and reconstruction code, and training/evaluation programs for the 16 CNN/ViT baselines. The existing model checkpoints remain in [model/](model/). Obtain the underlying images from the [original data providers](docs/sources.md).
+The release connects every listed sample to its source, class, and fixed split. Explore the image manifest and source references, reconstruct the benchmark with the preparation tools, and train or evaluate **16 CNN/ViT baselines** using the supplied configurations and [OpenPlant checkpoints](model/).
+
+| Resource | Start here |
+|---|---|
+| **Images and labels** | [Complete manifest](metadata/manifest.csv.gz) · [Preview sample records](metadata/manifest_examples.csv) · [1,167 classes](metadata/classes.csv) |
+| **Sources and references** | [41-dataset catalogue](docs/sources.md) · [Source contributions](metadata/source_counts.csv) · [BibTeX references](references/datasets.bib) |
+| **Reconstruction** | [Prepare images from the fixed manifest](docs/reconstruction.md) |
+| **Training and evaluation** | [16 model configurations and usage guide](docs/training.md) · [Model checkpoints](model/) |
+
+### Fixed benchmark splits
 
 | Split | Images |
 |---|---:|
@@ -25,7 +53,10 @@ This GitHub release provides the full image membership and fixed splits, source 
 | Test | 127,956 |
 | **Total** | **635,176** |
 
-The counts above are the exact assignments in the historical image mapping. Use those assignments for benchmark comparisons; do not draw a new 7:1:2 split. The catalogue lists 41 sources, while the image mapping contains 39 named source groups. [The source table](docs/sources.md#source-catalogue) accounts for every catalogue entry and its traceable contribution.
+Use the manifest's fixed train, validation, and test assignments for benchmark comparisons. The [source catalogue](docs/sources.md#source-catalogue) documents 41 datasets and traces the released samples to 39 named source groups.
+
+<details>
+<summary><strong>Browse all metadata files</strong></summary>
 
 | File | Contents |
 |---|---|
@@ -33,16 +64,18 @@ The counts above are the exact assignments in the historical image mapping. Use 
 | [manifest_examples.csv](metadata/manifest_examples.csv) | Small, directly browsable excerpt with the same columns |
 | [classes.csv](metadata/classes.csv) | All 1,167 class IDs/names and per-split counts |
 | [source_counts.csv](metadata/source_counts.csv) | Contributions of the 39 mapped source groups |
-| [sources.csv](metadata/sources.csv) / [sources.json](metadata/sources.json) | All 41 source links, versions, citations, and recorded data terms |
+| [sources.csv](metadata/sources.csv) / [sources.json](metadata/sources.json) | 41 dataset entries with access links, citations, contribution counts, and recorded data terms |
 | [source_label_mapping.json](metadata/source_label_mapping.json) | Historical source-label-to-scientific-name mapping |
 | [summary.json](metadata/summary.json) | Counts, preparation protocol, and manifest checksum |
 | [datasets.bib](references/datasets.bib) | Importable bibliography for the source datasets |
 
-The manifest is exported from the historical workbook. Per-image hashes, byte sizes, and dimensions were not recorded there and are left empty. [The data dictionary](docs/metadata.md) explains each field and the distinction between fixed membership and image-byte verification.
+The [data dictionary](docs/metadata.md) describes source paths, class and split assignments, and optional image-verification fields.
+
+</details>
 
 ## Get started
 
-Use Python 3.10 or later. The repository uses Git LFS for existing model weights. Clone the code and metadata without downloading every checkpoint:
+Use **Python 3.10 or later**. Start with the code and metadata; model checkpoints can be downloaded individually with Git LFS.
 
 ```bash
 git -c filter.lfs.smudge= -c filter.lfs.process= -c filter.lfs.required=false clone https://github.com/Kaiqi6/OpenPlant.git
@@ -50,7 +83,7 @@ cd OpenPlant
 python -m pip install -r requirements.txt
 ```
 
-Validate the published metadata without downloading or reading images:
+Check the manifest, class labels, and split counts:
 
 ```bash
 python scripts/validate_dataset.py --manifest metadata/manifest.csv.gz --classes metadata/classes.csv --summary metadata/summary.json --manifest-only
@@ -67,9 +100,9 @@ python scripts/build_dataset.py --source-root /path/to/downloads --output-root /
 python scripts/validate_dataset.py --output-root /path/to/OpenPlant-256 --manifest metadata/manifest.csv.gz --classes metadata/classes.csv --summary metadata/summary.json
 ```
 
-The build selects the recorded samples, extracts the specified plant regions where applicable, converts images to RGB, resizes the shorter edge to 256 pixels, and writes PNG files into the fixed `train/`, `val/`, and `test/` folders. It leaves the input files unchanged. Use `--source PlantVillage --limit 10` for a small trial, and `--resume` to verify and reuse previously built outputs.
+The build selects the recorded samples, extracts the specified plant regions where applicable, converts images to RGB, resizes the shorter edge to 256 pixels, and writes PNG files into the fixed `train/`, `val/`, and `test/` folders. Use `--source PlantVillage --limit 10` for a small trial, and `--resume` to verify and reuse previously built outputs.
 
-Some historical paths include renamed files. The reconstruction guide describes directory aliases, explicit file-path mappings, and annotation requirements for resolving those records. Missing inputs are reported rather than replaced with different images.
+Follow the [reconstruction guide](docs/reconstruction.md) for source layouts, filename mappings, and annotation requirements.
 
 ### Train and evaluate
 
@@ -81,16 +114,29 @@ python scripts/train.py --data-root /path/to/OpenPlant-256 --config configs/resn
 python scripts/evaluate.py --data-root /path/to/OpenPlant-256 --config configs/resnet18.json --manifest metadata/manifest.csv.gz --weights runs/resnet18/best.pt --output runs/resnet18-test --device cuda
 ```
 
-To retrieve and evaluate an existing OpenPlant checkpoint after installing Git LFS:
+<details>
+<summary><strong>Evaluate a published OpenPlant checkpoint</strong></summary>
+
+Install Git LFS, then retrieve the selected weights and run evaluation:
 
 ```bash
 git lfs pull --include="model/resnet18.pth"
 python scripts/evaluate.py --data-root /path/to/OpenPlant-256 --config configs/resnet18.json --manifest metadata/manifest.csv.gz --weights model/resnet18.pth --output runs/published-resnet18 --device cuda
 ```
 
-The [training guide](docs/training.md) lists all 16 configurations, CPU execution, checkpoint resume, metric definitions, and the relationship between the refactored implementation and historical experiments. The paper figures show the published results; this code release does not report a new full benchmark run.
+</details>
+
+The [training guide](docs/training.md) covers all 16 model configurations, CPU execution, checkpoint resume, metric definitions, and configuration provenance.
 
 ## Dataset diversity
+
+### Common and rare plant classes
+
+![OpenPlant class distribution and representative head, medium, and tail samples](assets/figures/long_tail_distribution.png)
+
+*Figure 1: the long-tailed class distribution and representative samples from head, medium, and tail classes.*
+
+### Across sources and environments
 
 <p align="center">
   <img src="assets/figures/diversity.png" width="49%" alt="Representative plant species across multiple source datasets">
@@ -99,23 +145,34 @@ The [training guide](docs/training.md) lists all 16 configurations, CPU executio
 
 *Figure 2 panels: examples across data sources and dataset scale.*
 
+<details>
+<summary><strong>Explore the taxonomic hierarchy — 48 orders · 125 families · 428 genera</strong></summary>
+
 <p align="center">
   <img src="assets/figures/hierarchy.png" width="760" alt="OpenPlant taxonomic hierarchy with example plant images">
 </p>
 
 *Figure 3: taxonomic organization of OpenPlant. The paper reports 48 orders, 125 families, and 428 genera.*
 
+</details>
+
 ## Published benchmark results
+
+The paper compares **10 CNNs and 6 ViTs** on the classification benchmark and evaluates **12 VLMs** with a multiple-choice protocol. The panels below summarize the published comparisons.
+
+### CNNs and vision transformers
 
 ![Representative CNN and ViT performance comparison from the paper](assets/figures/radar.png)
 
 *Figure 5b panel: representative CNN/ViT performance across classification metrics.*
 
+### Vision-language models
+
 ![Vision-language model results from the paper](assets/figures/radar_vlm.png)
 
 *Figure 7: comparison of the vision-language models evaluated in the paper.*
 
-See the [complete figure gallery](docs/figures.md) for model evolution, class-level accuracy, PR-AUC, confusion matrices, and example errors. The runnable training pipeline in this release covers CNNs and ViTs; [VLM evaluation scope](docs/training.md#vlm-scope) is documented separately.
+Explore the [complete figure gallery](docs/figures.md) for model evolution, class-level accuracy, PR-AUC, confusion matrices, and prediction examples. See the [VLM protocol and evaluation scope](docs/training.md#vlm-scope) for details of the vision-language study.
 
 ## Citation and terms
 
@@ -134,4 +191,4 @@ Please cite OpenPlant and acknowledge the original datasets used in your experim
 }
 ```
 
-The software is released under the [MIT license](LICENSE). Original images, third-party metadata, model initialization weights, and source annotations retain their respective terms; see [DATA_LICENSE.md](DATA_LICENSE.md) and [the source catalogue](docs/sources.md). This repository hosts the image list and paper figures, while the full underlying image collection is obtained from its original providers.
+The software is released under the [MIT license](LICENSE). Original images, third-party metadata, model initialization weights, and source annotations retain their respective terms; see [DATA_LICENSE.md](DATA_LICENSE.md). Download source images through the [dataset catalogue](docs/sources.md).
