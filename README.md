@@ -2,7 +2,7 @@
 
 **A large-scale benchmark for agricultural plant classification**
 
-[Paper](https://doi.org/10.3390/plants15050727) · [Image manifest](metadata/manifest.csv.gz) · [41 source datasets](docs/sources.md) · [Reconstruction](docs/reconstruction.md) · [Training](docs/training.md) · [Paper figures](docs/figures.md)
+[Paper](https://doi.org/10.3390/plants15050727) · [Image manifest](metadata/manifest.csv.gz) · [41 source datasets](docs/sources.md) · [Reconstruction](docs/reconstruction.md) · [Training](docs/training.md) · [Paper figures](docs/figures.md) · [OpenPlant mosaic (original TIFF)](assets/logo/openplant-mosaic.tiff)
 
 Official repository for **OpenPlant: A Large-Scale Benchmark Dataset for Agricultural Plant Classification Using CNNs, ViTs, and VLMs**, published in *Plants* 2026, 15(5), 727.
 

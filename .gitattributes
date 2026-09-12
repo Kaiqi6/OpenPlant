@@ -9,4 +9,5 @@
 *.yml text eol=lf
 *.txt text eol=lf
 *.png binary
+*.tiff binary
 *.gz binary
