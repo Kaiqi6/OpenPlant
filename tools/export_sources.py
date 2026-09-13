@@ -344,42 +344,37 @@ def export(args):
 def write_docs(records, path):
     text = """# Dataset sources and composition
 
-OpenPlant's released image list contains **635,176 samples across 1,167 classes**.
-The historical source catalogue contains **41 entries**: 24 disease datasets,
-16 crop/weed datasets, and one general plant dataset. The recovered image mapping
-assigns samples to **39 named source worksheets**. This page preserves all 41
-catalogue entries and reports the contribution that can be traced to each worksheet.
+OpenPlant contains **635,176 samples in 1,167 classes**. Its catalogue lists
+**41 datasets**: 24 disease datasets, 16 crop/weed datasets, and one general plant
+dataset. The image manifest traces the selected samples to **39 source groups**.
 
-Use [manifest.csv.gz](../metadata/manifest.csv.gz) for exact sample membership and
-fixed train/validation/test assignments, and [classes.csv](../metadata/classes.csv)
-for the class vocabulary. Machine-readable source records are available as
-[CSV](../metadata/sources.csv) and [JSON](../metadata/sources.json); all references
-can be imported from [datasets.bib](../references/datasets.bib).
+**We cannot currently distribute the complete OpenPlant image collection because
+of potential copyright and licensing conflicts.** Some source datasets may prohibit
+redistribution of original or modified images. Obtain the data from the providers
+below under their respective terms, then follow the
+[reconstruction guide](reconstruction.md) to build OpenPlant locally.
+See [data licensing](../DATA_LICENSE.md) for the release policy.
+
+[Image manifest](../metadata/manifest.csv.gz) · [Class list](../metadata/classes.csv) ·
+[Sources CSV](../metadata/sources.csv) / [JSON](../metadata/sources.json) ·
+[Full bibliography](../references/datasets.bib)
 
 ## How the collection is formed
 
-The paper describes selection of healthy examples from disease datasets, screening
-of poorly visible plants, taxonomic name standardization, and extraction of plant
-regions from object annotations. The released manifest records the retained
-samples after these operations. Its counts are output classification images;
-multiple crops may come from one upstream photograph. Upstream catalogue totals
-therefore cannot be subtracted from these counts to infer the number of rejected
-photographs. Source class counts also overlap and must not be summed to obtain
-OpenPlant's 1,167 classes.
+Preparation selects healthy examples from disease datasets, screens poorly visible
+plants, standardizes species names, and crops annotated plant regions. The manifest
+fixes the retained samples and their train/validation/test assignments.
 
-Download the sources from the links below and use the reconstruction instructions
-in the repository. Preserve the recorded source version where available and the
-manifest's fixed splits when comparing with the paper. A new random split defines
-a different experiment.
+Counts below refer to output classification images. One photograph can yield
+several crops, and classes can occur in several sources. Use the manifest totals
+for benchmark comparisons and the documented source versions for reconstruction.
 
 ## Source catalogue
 
-`source_id` is the stable join key used by the image manifest. **—** means that no
-separate contribution is recoverable from the image mapping, rather than a verified
-zero-image selection. CottonWeedDet3 and Carrot-Weed are listed in the original
-catalogue and paper, but neither has its own worksheet or registered adapter in the
-recovered build. They remain in this catalogue with `catalogue_only` status;
-the available records do not establish whether they were excluded or merged.
+`source_id` joins this table to the manifest. CottonWeedDet3 and Carrot-Weed have
+`catalogue_only` status: both appear in the paper, but neither has a separate
+mapping worksheet or registered adapter. Their contributions remain unresolved
+and are shown as **—**.
 
 | # | Source dataset | source_id | Mapped samples | Mapped classes | Access | Citation |
 |---:|---|---|---:|---:|---|---|
@@ -388,48 +383,65 @@ the available records do not establish whether they were excluded or merged.
         ref = r["references"][0]
         samples = f'{r["mapped_samples"]:,}' if r["mapped_samples"] is not None else "—"
         classes = str(r["mapped_classes"]) if r["mapped_classes"] is not None else "—"
-        text += f'| {r["catalogue_index"]} | {r["name"]} | `{r["source_id"]}` | {samples} | {classes} | [Data / homepage]({r["data_url"]}) | [{ref["year"]}](#{r["slug"]}) |\n'
+        text += f'| {r["catalogue_index"]} | {r["name"]} | `{r["source_id"]}` | {samples} | {classes} | [Data]({r["data_url"]}) | [{ref["year"]}](#{r["slug"]}) |\n'
     text += """
 ## References, versions and dataset terms
 
-The citations below follow the manuscript bibliography. A citation may be an
-article, preprint, dataset deposit, or repository; a data-page citation does not
-imply a separate research paper. The JSON records expose citation-verification
-status and evidence URLs. Dataset license declarations come from the linked data
-pages or their DataCite records reviewed on 12 September 2026. `unknown` means that a dataset
-license was not established in this review. Consult each source's current terms
-and preserve its required attribution. Article and code licenses are not used as
-substitutes for image licenses.
+References include papers, preprints, data deposits and repositories. Full author
+lists are in the bibliography; verification records are in the JSON.
+
+License labels below reproduce the source metadata reviewed on 12 September 2026.
+`unknown` means no data license is recorded there. Check the image terms applicable
+to the source version you obtain and retain attribution; a paper or code license
+alone does not establish image-reuse rights.
+The CWD30 and PlantNet-300K entries include additional terms to check before reuse.
 
 """
+    # Presentation-only notes: these do not change the source metadata or parser.
+    notes = {
+        "PlantVillage": "Use the recorded augmented deposit (61,486 images), read by the original adapter as `Plant_leave_diseases_dataset_with_augmentation`. The catalogue's 54,309 refers to PlantVillage generally. CC0 is the deposit's declaration; upstream image rights still need checking.",
+        "CGIAR": "The spreadsheet linked the AppleLeaf9 paper here. This entry uses the CGIAR data citation from the manuscript.",
+        "chilli": "The download is Mendeley V2 (2024), deposited by Aishwarya M P and Padmanabha Reddy. The manuscript cites Naik et al. (2022); the deposit does not establish that connection. Both references are retained.",
+        "PLD": "Upstream totals differ: 4,072 in the spreadsheet and 4,062 in the paper. The manifest contains 1,020 selected images.",
+        "Cassava": "The link and paper describe the 2019 iCassava challenge; the catalogue lists 21,400 images without an archive version. Use the manifest's filenames for the 316 selected images.",
+        "WeedNet-R": "SugarBeet2016 uses the WeedNet-R adapter and worksheet. The repository credits Sugar Beets 2016 as its source; OpenPlant counts the extracted plant crops.",
+        "CWD30": "The [official Terms of Use](https://cwd-30.github.io/cwd-30/terms_of_use.html) declare CC BY-NC-SA 4.0 and separately prohibit redistribution of original or modified data. See [data licensing](../DATA_LICENSE.md) for this conflict.",
+        "PlantSeedlings": "Use the official page's **NonsegmentedV2** download, as specified by the adapter.",
+        "plantnet_300K": "Zenodo V1.1 declares CC BY 4.0 at deposit level. The official repository provides per-image author and license metadata: retain it and check each image's terms. Its 1,081 upstream labels map to 1,021 distinct class names in OpenPlant.",
+        "OPPD": "The upstream total of 315,038 counts plant objects in 7,590 RGB photographs. OpenPlant selects individual-plant images from `images_plants`.",
+        "CottonWeedDet3": "",
+        "Carrot-Weed": "",
+        "SorghumWeed": "The manifest includes the 1,404 sorghum images. Generic grass and broad-leaf weed labels are omitted.",
+        "ImageWeeds": "DataCite confirms the V2 deposit and CC BY 4.0 declaration. If the Mendeley page is unavailable, consult the linked paper for access information.",
+        "Weed25": "Baidu access code: **rn5h**, as supplied in the paper. The recorded access page is the paper DOI.",
+    }
     for r in records:
         text += f'<a id="{r["slug"]}"></a>\n\n### {r["name"]}\n\n'
-        text += f'**Source ID:** `{r["source_id"]}` · **Dataset license:** `{r["dataset_license"]}`\n\n'
-        text += f'[Data / homepage]({r["data_url"]})'
+        text += f'[Data]({r["data_url"]}) · License: `{r["dataset_license"]}`'
         if r["data_doi"]:
             text += f' · [Dataset DOI](https://doi.org/{r["data_doi"]})'
         if r["homepage_url"] != r["data_url"]:
-            text += f' · [Project / recorded access page]({r["homepage_url"]})'
+            text += f' · [Project / access page]({r["homepage_url"]})'
         if r["license_evidence_url"] and r["license_evidence_url"] != r["data_url"]:
             text += f' · [License declaration]({r["license_evidence_url"]})'
         text += "\n\n"
         for ref in r["references"]:
-            venue = f' {ref["venue"]}.' if ref["venue"] else ""
-            text += f'{ref["authors"]} ({ref["year"]}). [{ref["title"]}]({ref["url"]}).{venue} BibTeX: `{ref["citekey"]}`.\n\n'
-        if r["notes"]:
-            text += r["notes"] + "\n\n"
+            authors = ref["authors"].split(" and ")
+            author_label = authors[0].split(",")[0] + " et al." if len(authors) > 2 else " and ".join(author.split(",")[0] for author in authors)
+            venue = f' {ref["venue"].rstrip(".")}.' if ref["venue"] else ""
+            text += f'{author_label} ({ref["year"]}). [{ref["title"]}]({ref["url"]}).{venue} `{ref["citekey"]}`.\n\n'
+        note = notes.get(r["source_id"], r["notes"])
+        if note:
+            text += note + "\n\n"
     text += """## Provenance
 
-Counts are calculated from the 39 source worksheets in
-`image_mapping_test_0220.xlsx`; the `datasets` summary worksheet is not counted a
-second time. Names, links, and historical upstream sizes come from Sheet4 of
-`datasets(已自动还原).xlsx`. Citation keys and bibliographic fields come from the
-manuscript's `openplant.bib`, with separately identified primary-source additions.
-The JSON includes SHA-256 hashes of these three source files. Historical catalogue
-sizes are preserved as `catalogue_image_count`, not presented as currently verified
-upstream sizes or OpenPlant contribution counts.
+Counts come from the 39 source worksheets in `image_mapping_test_0220.xlsx`.
+Sheet4 of `datasets(已自动还原).xlsx` supplies the catalogue; `openplant.bib`
+supplies the manuscript references, supplemented by primary-source records.
+The JSON includes their SHA-256 hashes. `catalogue_image_count` stores the
+historical upstream totals; `mapped_samples` counts OpenPlant's selected images.
 
-The source documentation can be regenerated without changing these inputs:
+Regenerate the source files from those inputs:
 
 ```bash
 python tools/export_sources.py --catalogue /path/to/catalogue.xlsx \\
@@ -437,9 +449,8 @@ python tools/export_sources.py --catalogue /path/to/catalogue.xlsx \\
   --bibliography /path/to/openplant.bib --output . --verify-dois
 ```
 
-The `--verify-dois` option checks supported article DOIs through Crossref. Other
-verification and dataset-license evidence is recorded from the primary pages
-reviewed for this release.
+`--verify-dois` checks article DOIs through Crossref. Data-license declarations
+have separate evidence links in the source records.
 """
     path.write_text(text, encoding="utf-8")
 

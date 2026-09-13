@@ -37,6 +37,10 @@ This is the official repository for [**OpenPlant: A Large-Scale Benchmark Datase
 
 The release connects every listed sample to its source, class, and fixed split. Explore the image manifest and source references, reconstruct the benchmark with the preparation tools, and train or evaluate **16 CNN/ViT baselines** using the supplied configurations and [OpenPlant checkpoints](model/).
 
+### Data availability
+
+Because of potential copyright and licensing conflicts, we cannot currently distribute the complete OpenPlant image collection. Some source datasets may prohibit redistribution of their original or modified images. Obtain images directly from the [original providers](docs/sources.md) under their respective terms, then [build OpenPlant locally](docs/reconstruction.md) using the released manifest and code. See [data terms](DATA_LICENSE.md) for details.
+
 | Resource | Start here |
 |---|---|
 | **Images and labels** | [Complete manifest](metadata/manifest.csv.gz) · [Preview sample records](metadata/manifest_examples.csv) · [1,167 classes](metadata/classes.csv) |

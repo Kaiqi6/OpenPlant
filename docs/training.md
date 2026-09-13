@@ -1,20 +1,20 @@
 # Training and evaluation
 
-This release provides rewritten training and evaluation programs for all 16 CNN/ViT baselines. The model names, data normalization, augmentations and available historical settings are recorded in versioned JSON configurations. The original project scripts and published model files are preserved; this release does not retrain the paper's experiments.
+Train and evaluate OpenPlant's 16 CNN/ViT baselines using the fixed data splits and per-model JSON configurations.
 
 ## Install
 
-Use a virtual environment with Python 3.10 or later. Install a matching PyTorch/torchvision pair for your CPU or CUDA platform, then install:
+Use Python 3.10 or later in a virtual environment. Install a matching PyTorch/torchvision pair for your CPU or CUDA platform, then:
 
 ```bash
 python -m pip install -r requirements-train.txt
 ```
 
-The paper reports `timm 1.0.20`, which is pinned here. PyTorch and torchvision must be compatible with each other and with the local accelerator. No OpenPlant images, ImageNet weights or commercial API calls are needed for `--help` or the synthetic smoke test.
+The requirements pin `timm 1.0.20`, the version reported in the paper.
 
 ## Fixed data and class order
 
-Use the prepared image tree produced by the reconstruction pipeline:
+Obtain the source images under their licenses and follow the [reconstruction guide](reconstruction.md) to prepare:
 
 ```text
 prepared/
@@ -23,47 +23,47 @@ prepared/
   test/<class_name>/<image>.png
 ```
 
-`metadata/manifest.csv.gz` fixes image membership and train/validation/test assignments. `metadata/classes.csv` fixes 0-based class IDs in the lexicographic order used by ImageFolder. Every split must expose the same class directories, including empty directories for any zero-count class. The code rejects missing, extra or reordered classes. Passing `--manifest` also rejects different files or labels. It never creates a new random split.
+`metadata/manifest.csv.gz` fixes image membership and split assignments. `metadata/classes.csv` defines 0-based class IDs in ImageFolder's lexicographic order. All splits must contain the same class directories, including empty ones for zero-count classes. Passing `--manifest` checks the exact paths and labels against the published mapping. These checks do not verify image bytes; blank hashes and byte counts in the manifest were not recorded in the historical workbook.
 
-The manifest was exported from the historical mapping workbook. Image hashes and byte counts that were not present in that record are blank. The release preparation did not scan or validate the original image files; the published mapping is the source of the fixed membership. Membership checks in the training commands compare paths and class IDs, not image bytes. Use the data audit command when checking a locally reconstructed copy.
+Inputs are RGB images with the shorter edge resized to 256 pixels, preserving aspect ratio. Training applies `RandomResizedCrop`, horizontal flip (p=0.5), rotation (±15°), brightness/contrast/saturation jitter (0.2), tensor conversion and normalization. Validation and test use `CenterCrop` and the same normalization. Interpolation follows torchvision defaults: bilinear for random resized crop, nearest for rotation.
 
-Inputs must already follow the published image preparation recipe: RGB, shorter edge 256 pixels with aspect ratio preserved. The training code does not resize them a second time. Training applies `RandomResizedCrop`, horizontal flip (p=0.5), rotation (±15 degrees), brightness/contrast/saturation jitter (0.2), tensor conversion and normalization. Validation and test apply `CenterCrop`, tensor conversion and the same normalization. Torchvision's default interpolation is retained (bilinear for random resized crop, nearest for rotation).
-
-Mean: `[0.43056735, 0.46167394, 0.36951741]`.
-Standard deviation: `[0.22340974, 0.21595199, 0.22381605]`.
+```text
+mean = [0.43056735, 0.46167394, 0.36951741]
+std  = [0.22340974, 0.21595199, 0.22381605]
+```
 
 ## Run a model
 
-Run these commands from the repository root after preparing the images:
+Run from the repository root after preparing the images:
 
 ```bash
 python scripts/train.py --data-root /path/to/prepared --config configs/resnet18.json --manifest metadata/manifest.csv.gz --output runs/resnet18 --device cuda
 python scripts/evaluate.py --data-root /path/to/prepared --config configs/resnet18.json --manifest metadata/manifest.csv.gz --weights runs/resnet18/best.pt --output runs/resnet18-test --device cuda
 ```
 
-The default pretrained initialization uses timm's configured weights. For a local pretraining file, add `--pretrained-file /path/to/weights.bin`. For a CPU run without any weight download, add `--device cpu --workers 0 --pretrained false --amp false --data-parallel false`. That is a randomly initialized experiment, so record it separately from pretrained baselines.
+Pretraining uses timm's configured weights. Add `--pretrained-file /path/to/weights.bin` to load a local file. For CPU training from random initialization, use `--device cpu --workers 0 --pretrained false --amp false --data-parallel false`.
 
-Evaluate an existing published OpenPlant checkpoint:
+To evaluate a published checkpoint:
 
 ```bash
 python scripts/evaluate.py --data-root /path/to/prepared --config configs/resnet18.json --manifest metadata/manifest.csv.gz --weights model/resnet18.pth --output runs/published-resnet18 --device cuda
 ```
 
-The loader accepts the original tensor-only `OrderedDict` state files (including a leading `module.` prefix) and new complete checkpoints. It uses `torch.load(..., weights_only=True)`, strict parameter loading and shape checks. All 16 original checkpoints were inspected: their classification heads have 1,167 outputs. Legacy checkpoints do not embed class names, so their ordering depends on the released historical class mapping. New checkpoints store the full ordered class list and the metadata hash.
+The loader accepts original `.pth` state dictionaries, including `module.` prefixes, and new complete checkpoints. It uses `weights_only=True` and rejects incompatible parameter shapes. The original 1,167-class weights depend on the published class order; new checkpoints also store class names and the metadata hash.
 
-Training writes `best.pt` immediately whenever validation loss improves, `last.pt` after each completed epoch, `history.json`, the resolved `config.json` and `environment.json`. Each file is replaced atomically; an improved `best.pt` is committed before `last.pt`. Full checkpoints contain the optimizer, scheduler, AMP scaler and random-number states. Resume in the original output directory:
+Training saves `best.pt` at the lowest validation loss and `last.pt` after every completed epoch, alongside `history.json`, `config.json` and `environment.json`. Full checkpoints include optimizer, scheduler, AMP scaler and random-number states. Resume in the same output directory:
 
 ```bash
 python scripts/train.py --data-root /path/to/prepared --config configs/resnet18.json --manifest metadata/manifest.csv.gz --output runs/resnet18 --resume runs/resnet18/last.pt --epochs 100 --device cuda
 ```
 
-If a process stops between those two writes, resume detects a newer complete `best.pt` and continues from it, preserving both weights and optimizer state. A missing best file can be restored from `last.pt` when the last epoch is itself the best. An older best that is missing or inconsistent cannot be recovered from later weights, so resume fails with a clear error. If interruption occurred on the first epoch before `last.pt` was created, resume explicitly from `best.pt` instead.
+`--epochs` sets the final epoch count. Files are replaced atomically, with an improved `best.pt` written before `last.pt`. Resume recovers a newer complete best checkpoint if writing stopped between the two files. It can also restore a missing best file when `last.pt` contains that epoch; otherwise it reports an error. If the first epoch saved only `best.pt`, resume from that file.
 
-`--epochs` is the final target epoch count. A legacy `.pth` has no complete optimizer or random-number state; use `--weights model/resnet18.pth` to initialize a new training run. `--seed`, `--workers`, `--batch-size`, `--epochs`, `--image-size`, `--amp`, `--data-parallel` and `--pretrained` override the JSON. `--image-size` supports models with flexible input dimensions, such as ResNet; fixed-input models such as ViT and Swin reject non-native dimensions before model creation. For other changes, copy the JSON to a new configuration. Seed changes affect training randomness and do not alter fixed data assignments.
+Use `--weights model/resnet18.pth` to start a new run from legacy weights. CLI overrides include `--seed`, `--workers`, `--batch-size`, `--epochs`, `--image-size`, `--amp`, `--data-parallel` and `--pretrained`. Fixed-input models such as ViT and Swin reject non-native image sizes; flexible models such as ResNet accept them. Copy the JSON to change other settings. Changing the seed never changes the fixed splits.
 
 ## Models and historical settings
 
-The common optimizer is AdamW with weight decay 0.1, cross-entropy loss and exponential learning-rate decay (`gamma=0.9`, once after each epoch). Training lasts 100 epochs. Early stopping is disabled (`patience=0`); the early-stopping script in the old project used an older 1,142-class dataset and is not the released baseline. Gradient clipping uses a maximum norm of 1.0.
+All configurations use AdamW, weight decay 0.1, cross-entropy loss, gradient clipping at norm 1.0 and exponential learning-rate decay (`gamma=0.9` after each epoch). Training lasts 100 epochs with early stopping disabled (`patience=0`).
 
 | Configuration | timm model name | Crop size | Initial LR | Original checkpoint |
 |---|---|---:|---:|---|
@@ -84,34 +84,39 @@ The common optimizer is AdamW with weight decay 0.1, cross-entropy loss and expo
 | `mobilevitv2.json` | `mobilevitv2_200.cvnets_in1k` | 256 | 0.001 | `model/mobilevitv2.pth` |
 | `efficientvit_l3.json` | `efficientvit_l3.r224_in1k` | 224 | 0.01* | `model/efficientvit_l3.pth` |
 
-Fourteen run folders contain saved configurations with batch size 64, seed 42, eight loader workers, AMP and DataParallel enabled, and learning rate 0.001. The ViT-Base and EfficientViT-L3 saved configuration files are empty. Their 100 recorded learning rates start at 0.009 after an epoch-end decay of 0.9, supporting the marked inference of an initial learning rate of 0.01. Batch size 64, seed 42, 16 workers, AMP enabled and DataParallel disabled for these two configurations are explicit fallbacks to the archived `test11.py` defaults, not recovered runtime settings. Each JSON contains `provenance` describing these distinctions and the historical run folder.
+Fourteen saved run configurations specify batch size 64, seed 42, eight workers, AMP and DataParallel enabled, and learning rate 0.001.
 
-Image sizes follow the registered timm pretrained configurations, as the old scripts selected them from `model.default_cfg`. The historical transform for Xception applies a 299-pixel center crop to images with shorter edge 256; torchvision pads where required. This behavior is retained. The untagged ViT-Tiny name is retained from its run record; its registered default in the tested timm installation is `augreg_in21k_ft_in1k`.
+\* ViT-Base and EfficientViT-L3 have empty saved configuration files. Their 100 recorded learning rates start at 0.009 after decay by 0.9, implying an initial rate of 0.01. Their remaining settings fall back to `test11.py`: batch size 64, seed 42, 16 workers, AMP enabled and DataParallel disabled. These are defaults, not recovered runtime values. Each JSON's `provenance` field records the evidence and fallback settings.
+
+Crop sizes follow timm's registered pretrained configurations. Xception retains the historical 299-pixel center crop on images with shorter edge 256, padding where needed. The untagged ViT-Tiny name retains timm's default `augreg_in21k_ft_in1k` initialization.
 
 ## Evaluation outputs and definitions
 
-`metrics.json` includes top-1 accuracy, top-5 accuracy, cross-entropy, Cohen's kappa and precision/recall/F1 using macro, weighted and micro averaging. All class IDs participate in those averages, with undefined precision/recall set to zero. `per_class.csv` contains class-level precision, recall, F1, support, AP and trapezoidal PR-AUC. `predictions.csv` records each relative image path, true and predicted labels and top-5 labels/probabilities. `confusion_matrix.npy` is indexed by the published class IDs.
+| File | Contents |
+|---|---|
+| `metrics.json` | Top-1/top-5 accuracy, cross-entropy, Cohen's kappa, precision/recall/F1 and ranking metrics |
+| `per_class.csv` | Precision, recall, F1, support, AP and PR-AUC by class |
+| `predictions.csv` | Relative image path, true/predicted labels and top-5 labels/probabilities |
+| `confusion_matrix.npy` | Counts indexed by the published class IDs |
 
-AP and PR-AUC are distinct: AP uses `average_precision_score`; PR-AUC integrates the precision-recall curve with trapezoids. Macro ranking metrics average classes with at least one evaluation positive. Micro ranking metrics flatten all sample/class pairs. Undefined kappa is exported as JSON `null`. When fewer than five classes are used in a smoke fixture, top-k uses `min(5, number_of_classes)` and exports the actual `top_k`.
+Precision, recall and F1 use macro, weighted and micro averaging over all classes; undefined precision/recall is zero. AP uses `average_precision_score`; PR-AUC integrates the precision-recall curve with trapezoids. Macro ranking averages classes with evaluation positives; micro ranking flattens all sample/class pairs. Undefined kappa is `null`. Top-k uses `min(5, number_of_classes)` and records the actual `top_k`.
 
-If `classes.csv` includes `total_count`, accuracy is also reported for frequency groups ranked by total image count, with class ID as a deterministic tie break. The first floor(20%) are head classes, the next through floor(50%) are medium classes and the remainder are tail classes. For OpenPlant this gives 233/350/584 classes. The group memberships are saved explicitly; no assumption is made that ties were handled identically in every historical plotting script.
+With `total_count` in `classes.csv`, evaluation also reports head/medium/tail accuracy. Classes are ranked by total image count, with class ID breaking ties: the first floor(20%) are head, the next through floor(50%) are medium, and the remainder are tail. OpenPlant has 233/350/584 classes in these groups; memberships are saved in the output.
 
-The default `--ranking-metrics full` computes exact macro and micro AP/PR-AUC. Scores are written through a float32 memory-mapped array to reduce inference memory. Exact micro sorting still needs several gigabytes of RAM for the full test set because it operates on `number_of_images × 1167` entries. Use `--ranking-metrics macro` to omit micro ranking, or `--ranking-metrics none` for classification-only evaluation. Skipped metrics are omitted. The temporary probability array is removed at completion unless `--save-probabilities` is supplied.
+`--ranking-metrics full` computes macro and micro AP/PR-AUC. Exact micro ranking needs several gigabytes of RAM for the full test set. Use `--ranking-metrics macro` to skip micro ranking or `--ranking-metrics none` for classification metrics alone. Add `--save-probabilities` to retain the float32 `probabilities.npy` array.
 
 ## Reproduction scope and validation
 
-The rewritten programs preserve the documented data protocol and recovered model settings. They correct implementation issues in the archived scripts: AMP gradients are unscaled before clipping; the scaler and scheduler persist across epochs; DataParallel is configured once; CPU and zero-worker execution are supported; the best validation-loss checkpoint is serialized immediately; and complete state is available for epoch-boundary resume. Original `best_model_state = model.state_dict()` assignments retained references to live tensors until final serialization, so historical filenames alone do not establish that a saved file is the lowest-loss epoch. The new evaluation also computes softmax in float32 after model inference.
+Use the fixed mapping and original weights when comparing with the paper. The rewritten trainer unscales AMP gradients before clipping, keeps the scaler and scheduler across epochs, and saves the best weights immediately. The original scripts retained live `state_dict()` references until serialization, so their `best` filenames do not establish the lowest-loss epoch. These corrections, the two fallback configurations and runtime versions can change scores; the full 16-model benchmark has not been rerun with this code.
 
-Those corrections, the two partially recovered configurations, library/backend versions and numerical precision can change results. This release does not claim that rerunning the rewritten code produces the paper's exact numerical scores. The historical fixed mapping and original model weights remain the reference for comparison. Neither the original image bytes nor the full 16-model experiment was revalidated during this release.
-
-Run the synthetic test:
+Run the synthetic CPU tests:
 
 ```bash
 python -m unittest discover -s tests -p test_training.py -v
 ```
 
-It generates a temporary two-class image fixture and checks CPU training without downloads, equality of continuous and resumed training weights, interrupted best/last checkpoint recovery, stable best-checkpoint storage, evaluation and CSV exports, fixed-manifest mismatch detection, safe legacy checkpoint loading, rejection of incompatible classification heads and fixed-input dimensions, and binary AP calculations. All four training tests passed with PyTorch 2.4.0 and torchvision 0.19.0, both with the available timm 1.0.8 environment and with an isolated local installation of the pinned timm 1.0.20. The pinned version also resolved all 16 model configurations and strictly loaded the original ResNet-18 checkpoint. Full-dataset and all-model experiment validation remain outside this release check.
+Four tests cover training/resume equivalence, interrupted checkpoint recovery, evaluation exports, manifest and model-shape checks. They passed with PyTorch 2.4.0, torchvision 0.19.0 and timm 1.0.20. All 16 model configurations resolve, and the original ResNet-18 weights load strictly.
 
 ## VLM scope
 
-The runnable baseline pipeline in this release covers the 16 CNN/ViT models. The paper's 12-VLM study used a separate multiple-choice protocol with candidate labels derived from CNN/ViT predictions and API or local model backends. Commercial credentials and personal inference scripts are not included. CNN/ViT prediction exports can support a future audited VLM evaluation release; they are not themselves a reproduction of the paper's VLM results.
+The paper's 12-VLM study uses a separate multiple-choice protocol with candidate labels derived from CNN/ViT predictions. This release provides CNN/ViT training and prediction exports. VLM inference backends and the multiple-choice evaluation pipeline are not included.

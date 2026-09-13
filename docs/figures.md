@@ -1,6 +1,6 @@
 # Figures from the OpenPlant paper
 
-These are the authors' original figure assets for [Liu et al., *Plants* 2026, 15(5), 727](https://doi.org/10.3390/plants15050727). Multi-panel figures are shown as their component panels. Images have been copied without altering their scientific content. [Asset provenance](../assets/figures/provenance.json) records filenames and SHA-256 checksums.
+Figures from [Liu et al., *Plants* 2026, 15(5), 727](https://doi.org/10.3390/plants15050727), with multi-panel figures shown as separate panels. [File records](../assets/figures/provenance.json) contain the original filenames and SHA-256 checksums.
 
 ## Figure 1: Long-tailed class distribution
 
@@ -53,4 +53,4 @@ These are the authors' original figure assets for [Liu et al., *Plants* 2026, 15
 
 ![Prediction correlation among CNNs, ViTs, and VLMs](../assets/figures/model_correlation_matrix.png)
 
-Please cite the paper and preserve any source-specific image credits when reusing figures. See [data and figure terms](../DATA_LICENSE.md).
+Cite OpenPlant and retain source image credits when reusing figures. [Data and figure terms](../DATA_LICENSE.md) cover reuse permissions and access to the underlying images.
